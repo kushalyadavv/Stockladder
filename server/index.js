@@ -274,7 +274,7 @@ app.get("/api/health", async (req, res) => {
   });
 });
 
-app.get("/api/plan", (_req, res) => {
+app.get("/api/plan", (req, res) => {
   try {
     const { shop, record, plan, usage } = getPlanContext(req.shop);
     res.json({
@@ -342,7 +342,7 @@ app.put("/api/config", (req, res) => {
   }
 });
 
-app.get("/api/collections", async (_req, res) => {
+app.get("/api/collections", async (req, res) => {
   try {
     const client = await getClient(req.shop);
     const collections = await fetchAllCollections(client);

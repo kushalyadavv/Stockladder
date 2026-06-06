@@ -122,7 +122,7 @@ async function main() {
         clientId,
         clientSecret,
         code,
-        expiring: "0",
+        expiring: "1",
       });
 
       saveShopAuth(shop, {

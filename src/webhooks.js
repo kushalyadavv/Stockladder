@@ -52,9 +52,9 @@ export function scheduleDebouncedSort(collectionHandles, debounceMs, onLog) {
 }
 
 export async function handleInventoryWebhook(payload, config, onLog) {
-  const inventoryItemId = payload.inventory_item_id;
+  const inventoryItemId = payload.inventory_item_id ?? payload.id;
   if (!inventoryItemId) {
-    return { scheduled: false, reason: "no inventory_item_id" };
+    return { scheduled: false, reason: "no inventory item id" };
   }
 
   const { plan } = getPlanContext();

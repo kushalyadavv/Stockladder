@@ -3,7 +3,7 @@
 # Usage: bash setup-oracle.sh
 set -euo pipefail
 
-APP_DIR="${APP_DIR:-$HOME/stockladder}"
+APP_DIR="${APP_DIR:-$HOME/Stockladder}"
 REPO_URL="${REPO_URL:-}"
 
 echo "==> Stockladder Oracle setup (Always Free)"
@@ -37,10 +37,13 @@ sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
 echo "y" | sudo ufw enable || true
 
-# Oracle Ubuntu images often block ports via iptables — open 80/443
+# Oracle Ubuntu images often block ports via iptables — open 80/443 BEFORE the REJECT rule
 if sudo iptables -L INPUT -n 2>/dev/null | grep -q "REJECT"; then
-  sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT
-  sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 443 -j ACCEPT
+  REJECT_LINE=$(sudo iptables -L INPUT -n --line-numbers | awk '/REJECT/ {print $1; exit}')
+  if [[ -n "$REJECT_LINE" ]]; then
+    sudo iptables -I INPUT "$REJECT_LINE" -m state --state NEW -p tcp --dport 443 -j ACCEPT
+    sudo iptables -I INPUT "$REJECT_LINE" -m state --state NEW -p tcp --dport 80 -j ACCEPT
+  fi
   sudo netfilter-persistent save 2>/dev/null || sudo sh -c 'iptables-save > /etc/iptables/rules.v4' 2>/dev/null || true
 fi
 
@@ -66,6 +69,8 @@ mkdir -p "$APP_DIR/data/shops"
 echo ""
 echo "Next steps:"
 echo "  1. Create $APP_DIR/.env (see .env.example — set PUBLIC_URL=https://stockladder.xyz)"
-echo "  2. cd $APP_DIR && pm2 start server/index.js --name stockladder"
-echo "  3. pm2 save && pm2 startup   # follow the printed command"
-echo "  4. curl -I https://stockladder.xyz/api/health?shop=YOUR-STORE.myshopify.com"
+echo "  2. cd $APP_DIR && npm install && npm run build:web"
+echo "  3. pm2 start npm --name stockladder -- start"
+echo "  4. sudo cp deploy/Caddyfile /etc/caddy/Caddyfile && sudo systemctl restart caddy"
+echo "  5. pm2 save && pm2 startup   # follow the printed sudo command"
+echo "  6. curl -I https://stockladder.xyz/api/health?shop=YOUR-STORE.myshopify.com"

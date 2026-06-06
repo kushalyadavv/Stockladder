@@ -71,13 +71,33 @@ export async function exchangeAuthorizationCode({
   clientId,
   clientSecret,
   code,
-  expiring = "0",
+  expiring = "1",
 }) {
   return postTokenRequest(store, {
     client_id: clientId,
     client_secret: clientSecret,
     code,
     expiring,
+  });
+}
+
+/** Migrate a legacy non-expiring offline token to an expiring one. */
+export async function exchangeForExpiringOfflineToken({
+  store,
+  clientId,
+  clientSecret,
+  offlineAccessToken,
+}) {
+  return postTokenRequest(store, {
+    grant_type: "urn:ietf:params:oauth:grant-type:token-exchange",
+    client_id: clientId,
+    client_secret: clientSecret,
+    subject_token: offlineAccessToken,
+    subject_token_type:
+      "urn:shopify:params:oauth:token-type:offline-access-token",
+    requested_token_type:
+      "urn:shopify:params:oauth:token-type:offline-access-token",
+    expiring: "1",
   });
 }
 

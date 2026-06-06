@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 import {
   buildAuthorizeUrl,
   exchangeAuthorizationCode,
+  exchangeForExpiringOfflineToken,
   normalizeShop,
   refreshAccessToken,
 } from "./auth.js";
@@ -145,7 +146,7 @@ export async function completeOAuthCallback({ shop, code, state }) {
     clientId: clientId(),
     clientSecret: clientSecret(),
     code,
-    expiring: "0",
+    expiring: "1",
   });
 
   saveShopAuth(normalized, {
@@ -169,35 +170,57 @@ export async function resolveShopAccessToken(shop) {
   const record = getShopRecord(normalized);
 
   if (record.accessToken) {
-    if (record.refreshToken) {
-      const expiresAt = record.tokenExpiresAt
-        ? Date.parse(record.tokenExpiresAt)
-        : null;
-      const shouldRefresh =
-        !expiresAt || expiresAt - Date.now() < 5 * 60 * 1000;
-
-      if (shouldRefresh) {
-        try {
-          const token = await refreshAccessToken({
-            store: normalized,
-            clientId: clientId(),
-            clientSecret: clientSecret(),
-            refreshToken: record.refreshToken,
-          });
-          saveShopAuth(normalized, {
-            accessToken: token.accessToken,
-            refreshToken: token.refreshToken ?? record.refreshToken,
-            scope: token.scope ?? record.scope,
-            expiresIn: token.expiresIn,
-          });
-          return token.accessToken;
-        } catch (err) {
-          console.warn(
-            `[auth] refresh failed for ${normalized}: ${err.message}`,
-          );
-        }
+    if (!record.refreshToken) {
+      try {
+        const token = await exchangeForExpiringOfflineToken({
+          store: normalized,
+          clientId: clientId(),
+          clientSecret: clientSecret(),
+          offlineAccessToken: record.accessToken,
+        });
+        saveShopAuth(normalized, {
+          accessToken: token.accessToken,
+          refreshToken: token.refreshToken,
+          scope: token.scope ?? record.scope,
+          expiresIn: token.expiresIn,
+        });
+        console.log(`[auth] migrated ${normalized} to expiring offline token`);
+        return token.accessToken;
+      } catch (err) {
+        throw new Error(
+          `Token migration failed for ${normalized}: ${err.message}. Reinstall: ${appBaseUrl()}/auth?shop=${encodeURIComponent(normalized)}`,
+        );
       }
     }
+
+    const expiresAt = record.tokenExpiresAt
+      ? Date.parse(record.tokenExpiresAt)
+      : null;
+    const shouldRefresh =
+      !expiresAt || expiresAt - Date.now() < 5 * 60 * 1000;
+
+    if (shouldRefresh) {
+      try {
+        const token = await refreshAccessToken({
+          store: normalized,
+          clientId: clientId(),
+          clientSecret: clientSecret(),
+          refreshToken: record.refreshToken,
+        });
+        saveShopAuth(normalized, {
+          accessToken: token.accessToken,
+          refreshToken: token.refreshToken ?? record.refreshToken,
+          scope: token.scope ?? record.scope,
+          expiresIn: token.expiresIn,
+        });
+        return token.accessToken;
+      } catch (err) {
+        console.warn(
+          `[auth] refresh failed for ${normalized}: ${err.message}`,
+        );
+      }
+    }
+
     return record.accessToken;
   }
 
