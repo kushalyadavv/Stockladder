@@ -239,10 +239,10 @@ export default function InstallGate({ shop: initialShop = "", embedded = false }
         >
           <motion.img
             className="landing__logo"
-            src="/favicon.png"
+            src="/stockladder-hero.png"
             alt="StockLadder"
-            width={56}
-            height={56}
+            width={72}
+            height={72}
             whileHover={{ rotate: [-2, 2, 0], scale: 1.05 }}
             transition={{ duration: 0.4 }}
           />
@@ -454,7 +454,11 @@ export default function InstallGate({ shop: initialShop = "", embedded = false }
         </motion.section>
 
         <footer className="landing__footer">
-          © {new Date().getFullYear()} StockLadder · Looqus Media Private Limited
+          <a href="/privacy" className="landing__footer-link">
+            Privacy Policy
+          </a>
+          <span className="landing__footer-sep"> · </span>
+          © {new Date().getFullYear()} StockLadder · Pinion Labs Inc.
         </footer>
       </div>
     </div>

@@ -703,7 +703,26 @@ app.post("/api/sort", async (req, res) => {
 });
 
 const webDist = join(ROOT, "web", "dist");
+const FAVICON_FILES = [
+  ["favicon.ico", "image/x-icon"],
+  ["favicon-16x16.png", "image/png"],
+  ["favicon-32x32.png", "image/png"],
+  ["favicon.png", "image/png"],
+  ["apple-touch-icon.png", "image/png"],
+  ["site.webmanifest", "application/manifest+json"],
+];
+
 if (existsSync(join(webDist, "index.html"))) {
+  for (const [name, type] of FAVICON_FILES) {
+    const filePath = join(webDist, name);
+    if (!existsSync(filePath)) continue;
+    app.get(`/${name}`, (_req, res) => {
+      res.setHeader("Cache-Control", "public, max-age=604800");
+      res.type(type);
+      res.sendFile(filePath);
+    });
+  }
+
   app.use(express.static(webDist));
   app.get("*", (_req, res) => {
     res.sendFile(join(webDist, "index.html"));

@@ -5,7 +5,10 @@ import en from "@shopify/polaris/locales/en.json";
 import "@shopify/polaris/build/esm/styles.css";
 import App from "./App.jsx";
 import EmbeddedShell from "./EmbeddedShell.jsx";
+import PrivacyPage from "./PrivacyPage.jsx";
 
+const path =
+  window.location.pathname.replace(/\/$/, "") || "/";
 const search = new URLSearchParams(window.location.search);
 const host = search.get("host");
 const apiKey = import.meta.env.VITE_SHOPIFY_CLIENT_ID?.trim();
@@ -41,11 +44,17 @@ function loadAppBridgeScript() {
 }
 
 async function mount() {
+  const root = createRoot(document.getElementById("root"));
+
+  if (path === "/privacy") {
+    root.render(<PrivacyPage />);
+    return;
+  }
+
   if (embedded) {
     await loadAppBridgeScript();
   }
 
-  const root = createRoot(document.getElementById("root"));
   const app = <App embedded={embedded} />;
 
   root.render(
