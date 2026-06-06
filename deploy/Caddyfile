@@ -1,0 +1,6 @@
+# Stockladder — free HTTPS via Caddy + Let's Encrypt
+# Copy to server: /etc/caddy/Caddyfile
+
+stockladder.xyz, www.stockladder.xyz {
+    reverse_proxy localhost:3001
+}
