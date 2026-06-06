@@ -1,0 +1,25 @@
+# Stockladder — Shopify app config for CLI deploy & Admin embed
+
+name = "Stockladder"
+handle = "stockladder"
+client_id = "YOUR_CLIENT_ID"
+application_url = "https://YOUR_DEPLOYED_URL"
+embedded = true
+
+[access_scopes]
+scopes = "read_products,write_products,read_inventory,read_orders"
+
+[auth]
+redirect_urls = [
+  "http://localhost:3001/auth/callback",
+  "https://YOUR_DEPLOYED_URL/auth/callback",
+]
+
+[webhooks]
+api_version = "2025-01"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true

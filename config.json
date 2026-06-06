@@ -1,0 +1,46 @@
+{
+  "forceManualSort": true,
+  "includeHandles": [],
+  "excludeHandles": [],
+  "includeIds": [],
+  "excludeIds": [],
+  "deprioritizeCollectionHandles": [
+    "accessories-1"
+  ],
+  "untrackedPosition": "top",
+  "sortDirection": "desc",
+  "minMovesBeforeReorder": 1,
+  "sortStrategy": "inventory_full",
+  "outOfStockAction": "push_down",
+  "useOnlineInventory": false,
+  "pinTags": [
+    "featured",
+    "pin-top"
+  ],
+  "promoteTags": [],
+  "demoteTags": [],
+  "promoteVendors": [],
+  "demoteVendors": [],
+  "lowStockThreshold": 5,
+  "sortRuleStack": [
+    "pinned",
+    "promoted_tags",
+    "promoted_vendors",
+    "untracked",
+    "in_stock_high",
+    "low_stock",
+    "in_stock_default",
+    "demoted_tags",
+    "demoted_vendors",
+    "deprioritized",
+    "out_of_stock"
+  ],
+  "collectionRules": {},
+  "sortVariantsByInventory": false,
+  "salesLookbackDays": 90,
+  "ga4PropertyId": "",
+  "abTests": [],
+  "seasonalCollections": [],
+  "smartCollectionMirrors": [],
+  "webhookDebounceMs": 90000
+}
