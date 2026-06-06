@@ -143,6 +143,12 @@ export default function App({ embedded = false }) {
   }, []);
 
   useEffect(() => {
+    if (!embedded && !shopFromUrl) {
+      setNeedsInstall(true);
+      setLoading(false);
+      return;
+    }
+
     refresh()
       .catch((e) => {
         if (e.code === "AUTH_REQUIRED" || e.code === "SHOP_REQUIRED") {
@@ -152,7 +158,7 @@ export default function App({ embedded = false }) {
         setToast({ tone: "critical", message: e.message });
       })
       .finally(() => setLoading(false));
-  }, [refresh]);
+  }, [refresh, embedded, shopFromUrl]);
 
   const saveSettings = async () => {
     setSaving(true);
