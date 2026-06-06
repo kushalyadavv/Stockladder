@@ -37,7 +37,7 @@ Open **http://localhost:5173** (API on port 3001).
 
 ### Dashboard features (Tier 3)
 
-- **Sales / revenue sort** — order by units or revenue in last 7/30/90 days (`read_orders` scope)
+- **Sales / revenue sort** — order by units or revenue in last 7/30/60 days (`read_orders` scope; 60-day max)
 - **GA4 metrics import** — paste CSV export; sort by page views or ATC rate
 - **Collection analytics** — position-change history after each live sort
 - **A/B strategy compare** — side-by-side preview; apply winning variant

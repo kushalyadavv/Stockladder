@@ -5,7 +5,7 @@ import {
 } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { DEFAULT_CONFIG } from "./config.js";
+import { DEFAULT_CONFIG, normalizeConfig } from "./config.js";
 import { shopDir, shopFileFor } from "./shop-data-path.js";
 import { ensureShopMigrated } from "./shop-migrate.js";
 import { resolveShop } from "./shop-store.js";
@@ -39,7 +39,10 @@ export function loadShopConfig(shop = "") {
     return migrated;
   }
 
-  return { ...DEFAULT_CONFIG, ...JSON.parse(readFileSync(path, "utf8")) };
+  return normalizeConfig({
+    ...DEFAULT_CONFIG,
+    ...JSON.parse(readFileSync(path, "utf8")),
+  });
 }
 
 export function saveShopConfig(config, shop = "") {
@@ -47,7 +50,7 @@ export function saveShopConfig(config, shop = "") {
   ensureShopMigrated(resolved);
   shopDir(resolved);
 
-  const merged = { ...DEFAULT_CONFIG, ...config };
+  const merged = normalizeConfig({ ...DEFAULT_CONFIG, ...config });
   writeFileSync(configPath(resolved), `${JSON.stringify(merged, null, 2)}\n`);
   return merged;
 }

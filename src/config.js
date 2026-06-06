@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { DEFAULT_SORT_RULE_STACK } from "./collection-config.js";
 import { getCurrentShop } from "./request-context.js";
+import { clampSalesLookbackDays } from "./sales.js";
 import { loadShopConfig, saveShopConfig } from "./shop-config.js";
 import { resolveShop } from "./shop-store.js";
 
@@ -44,6 +45,13 @@ function activeShop() {
   return getCurrentShop() || process.env.SHOPIFY_STORE?.trim() || "";
 }
 
+export function normalizeConfig(config) {
+  return {
+    ...config,
+    salesLookbackDays: clampSalesLookbackDays(config.salesLookbackDays),
+  };
+}
+
 export function loadConfig() {
   const shop = activeShop();
   if (shop) {
@@ -55,18 +63,18 @@ export function loadConfig() {
   }
 
   const raw = readFileSync(CONFIG_PATH, "utf8");
-  return { ...DEFAULT_CONFIG, ...JSON.parse(raw) };
+  return normalizeConfig({ ...DEFAULT_CONFIG, ...JSON.parse(raw) });
 }
 
 export function saveConfig(config) {
   const shop = activeShop();
+  const normalized = normalizeConfig({ ...DEFAULT_CONFIG, ...config });
   if (shop) {
-    return saveShopConfig(config, shop);
+    return saveShopConfig(normalized, shop);
   }
 
-  const merged = { ...DEFAULT_CONFIG, ...config };
-  writeFileSync(CONFIG_PATH, `${JSON.stringify(merged, null, 2)}\n`);
-  return merged;
+  writeFileSync(CONFIG_PATH, `${JSON.stringify(normalized, null, 2)}\n`);
+  return normalized;
 }
 
 export function shouldProcessCollection(collection, config) {

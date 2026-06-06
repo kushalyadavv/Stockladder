@@ -37,7 +37,7 @@
   ],
   "collectionRules": {},
   "sortVariantsByInventory": false,
-  "salesLookbackDays": 90,
+  "salesLookbackDays": 30,
   "ga4PropertyId": "",
   "abTests": [],
   "seasonalCollections": [],

@@ -25,6 +25,15 @@ const ORDERS_PROBE = `query OrdersProbe {
 
 const salesCache = new Map();
 
+/** Shopify read_orders scope covers roughly the last 60 days of orders. */
+export const MAX_SALES_LOOKBACK_DAYS = 60;
+
+export function clampSalesLookbackDays(days) {
+  const n = Number(days);
+  if (!Number.isFinite(n) || n < 1) return 30;
+  return Math.min(Math.round(n), MAX_SALES_LOOKBACK_DAYS);
+}
+
 export const SALES_SCOPE_MESSAGE =
   "Sales sort needs read_orders scope. Dev Dashboard → add read_orders → release → npm run auth:install";
 
@@ -60,6 +69,7 @@ function emptySalesResult(accessDenied = false, message = null) {
 }
 
 export async function fetchProductSalesMetrics(client, days = 30) {
+  days = clampSalesLookbackDays(days);
   const key = cacheKey(days);
   if (salesCache.has(key)) return salesCache.get(key);
 

@@ -17,7 +17,7 @@ import { api } from "./api.js";
 const SALES_PERIOD_OPTIONS = [
   { label: "7 days", value: "7" },
   { label: "30 days", value: "30" },
-  { label: "90 days", value: "90" },
+  { label: "60 days (max)", value: "60" },
 ];
 
 const AB_STRATEGY_OPTIONS = [
@@ -278,10 +278,16 @@ export default function Tier3Panel({
             <Select
               label="Sales lookback"
               options={SALES_PERIOD_OPTIONS}
-              value={String(config.salesLookbackDays ?? 30)}
+              value={String(
+                Math.min(config.salesLookbackDays ?? 30, 60),
+              )}
               onChange={(v) =>
-                setConfig((c) => ({ ...c, salesLookbackDays: Number(v) }))
+                setConfig((c) => ({
+                  ...c,
+                  salesLookbackDays: Math.min(Number(v), 60),
+                }))
               }
+              helpText="Uses Shopify order data (read_orders). Maximum 60 days."
             />
             {!features.ga4Import && (
               <Banner tone="info">GA4 import requires Pro plan.</Banner>
